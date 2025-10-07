@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Model\Table;
 
+use Cake\I18n\Date;
 use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
@@ -104,5 +105,26 @@ class RoomsTable extends Table
         $rules->add($rules->existsIn(['room_type_id'], 'RoomTypes'), ['errorField' => 'room_type_id']);
 
         return $rules;
+    }
+
+    public function findAvailableForHotel(SelectQuery $query, int $hotelId, Date $checkIn, Date $checkOut): SelectQuery
+    {
+        $conflicting = $this->Bookings->find('active')
+            ->select(['room_id'])
+            ->where([
+                'Bookings.check_in_date <' => $checkOut,
+                'Bookings.check_out_date >' => $checkIn,
+            ]);
+
+        $query
+            ->where(['Rooms.hotel_id' => $hotelId])
+            ->where(['Rooms.is_available' => true]);
+
+        $conflictingRoomIds = $conflicting->all()->extract('room_id')->toList();
+        if ($conflictingRoomIds) {
+            $query->whereNotInList('Rooms.id', $conflictingRoomIds);
+        }
+
+        return $query;
     }
 }

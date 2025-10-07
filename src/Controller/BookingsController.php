@@ -43,4 +43,27 @@ class BookingsController extends AppController
 
         $this->set(compact('hotels', 'city', 'checkIn', 'checkOut', 'searchPerformed'));
     }
+
+    public function availableRooms(int $hotelId)
+    {
+        $checkIn = $this->request->getQuery('check_in');
+        $checkOut = $this->request->getQuery('check_out');
+        if (!$checkIn || !$checkOut) {
+            $this->Flash->error(__('Please provide check-in and check-out dates.'));
+            return $this->redirect(['action' => 'search']);
+        }
+        $checkInDate = new Date($checkIn);
+        $checkOutDate = new Date($checkOut);
+
+        $hotel = $this->Bookings->Rooms->Hotels->get($hotelId);
+
+        $availableRooms = $this->Bookings->Rooms
+            ->find('availableForHotel', hotelId: $hotelId, checkIn: $checkInDate, checkOut: $checkOutDate)
+            ->contain(['RoomTypes'])
+            ->toArray();
+
+        $nights = $checkInDate->diffInDays($checkOutDate);
+
+        $this->set(compact('hotel', 'availableRooms', 'checkIn', 'checkOut', 'nights'));
+    }
 }
