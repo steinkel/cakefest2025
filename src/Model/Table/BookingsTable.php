@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Model\Table;
 
+use App\Model\Entity\Booking;
 use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
@@ -101,7 +102,8 @@ class BookingsTable extends Table
         $validator
             ->scalar('booking_status')
             ->maxLength('booking_status', 255)
-            ->allowEmptyString('booking_status');
+            ->allowEmptyString('booking_status')
+            ->inList('booking_status', Booking::STATUSES);
 
         $validator
             ->scalar('special_requests')

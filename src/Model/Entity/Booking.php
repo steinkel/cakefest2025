@@ -26,6 +26,17 @@ use Cake\ORM\Entity;
  */
 class Booking extends Entity
 {
+    public const STATUS_PENDING = 'pending';
+    public const STATUS_CONFIRMED = 'confirmed';
+    public const STATUS_COMPLETED = 'completed';
+    public const STATUS_CANCELLED = 'cancelled';
+    public const STATUSES = [
+        self::STATUS_PENDING,
+        self::STATUS_CONFIRMED,
+        self::STATUS_COMPLETED,
+        self::STATUS_CANCELLED,
+    ];
+
     /**
      * Fields that can be mass assigned using newEntity() or patchEntity().
      *

@@ -50,3 +50,49 @@ in config/routes.php
     //...
 ```
 
+# Navigate our admin app
+
+* Validate booking statuses
+
+src/Model/Entity/Booking.php
+
+```
+    public const STATUS_PENDING = 'pending';
+    public const STATUS_CONFIRMED = 'confirmed';
+    public const STATUS_COMPLETED = 'confirmed';
+    public const STATUS_CANCELLED = 'cancelled';
+    public const STATUSES = [
+        self::STATUS_PENDING,
+        self::STATUS_CONFIRMED,
+        self::STATUS_COMPLETED,
+        self::STATUS_CANCELLED,
+    ];
+```
+
+in BookingsTable
+```
+            ->inList('booking_status', Booking::STATUSES);
+```
+
+OR if you prefer using an enum
+
+```
+<?php
+namespace App\Enum;
+
+enum Status: string
+{
+    case Pending = 'pending';
+    case Confirmed = 'confirmed';
+    case Completed = 'completed';
+    case Cancelled = 'cancelled';
+}
+
+// and use
+$status = Status::Pending;
+echo $status->value; // 'pending'
+```
+
+
+
+* Improve Room display
