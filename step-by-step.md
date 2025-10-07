@@ -21,11 +21,20 @@ composer create-project cakephp/app cakefest2025
 * ddev setup
   * PHP 8.4
 * let's check the folder structure
-dbdump import
+
+# Hotel Reservation System
+
+* download the db schema from https://raw.githubusercontent.com/steinkel/cakefest2025/master/db.sql
+* import schema and sample data into ddev
 
 ```
 ddev import-db FILE
 ddev add-on get ddev/ddev-phpmyadmin
 ddev phpmyadmin
 ```
+
+# Bake shell
+
+ddev cake bake all --everything --prefix Admin
+
 
