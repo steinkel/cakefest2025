@@ -113,3 +113,17 @@ in RoomsTable initialize, replace displayField
 $this->setDisplayField('room_number_display');
 ```
 
+* Booking dates validation
+  * How would you ensure check in and check out dates are valid?
+  * https://book.cakephp.org/5/en/core-libraries/validation.html#using-custom-validation-rules
+
+# Setup cakedc/users
+
+```
+ddev composer require cakedc/users
+ddev cake plugin load CakeDC/Users
+ddev cake migrations migrate -p CakeDC/Users
+ddev cake users add_superuser -p password
+```
+
+#
