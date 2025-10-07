@@ -31,7 +31,7 @@ class BookingsController extends AppController
             } else {
                 $hotels = $this->Bookings->Rooms->Hotels
                     ->find()
-                    //->find('withAvailableRooms', checkIn: $checkInDate, checkOut: $checkOutDate)
+                    ->find('withAvailableRooms', checkIn: $checkInDate, checkOut: $checkOutDate)
                     ->where(['Hotels.city LIKE' => '%' . $city . '%'])
                     ->toArray();
 

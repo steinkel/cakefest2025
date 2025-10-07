@@ -126,4 +126,12 @@ class BookingsTable extends Table
 
         return $rules;
     }
+
+    public function findActive(SelectQuery $query): SelectQuery
+    {
+        return $query->whereNotInList(
+            $this->aliasField('booking_status'),
+            [Booking::STATUS_CANCELLED]
+        );
+    }
 }

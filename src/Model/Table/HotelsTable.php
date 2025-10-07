@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\Model\Table;
 
+use Cake\Database\Expression\QueryExpression;
+use Cake\I18n\Date;
 use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
@@ -96,5 +98,31 @@ class HotelsTable extends Table
             ->allowEmptyString('star_rating');
 
         return $validator;
+    }
+
+    public function findWithAvailableRooms(SelectQuery $query, Date $checkIn, Date $checkOut): SelectQuery
+    {
+        $roomsSubquery = $this->Rooms->find()
+            ->select(['Rooms.id'])
+            ->where(['Rooms.is_available' => true])
+            ->where(['Rooms.hotel_id = Hotels.id'])
+            ->where(function (QueryExpression $exp) use ($checkIn, $checkOut) {
+                // NOT EXISTS any overlapping active booking for the room
+                $overlap = $this->Rooms->Bookings->find('active')
+                    ->select(['Bookings.id'])
+                    ->where(['Bookings.room_id = Rooms.id'])
+                    // check if dates overlap
+                    ->where([
+                        'Bookings.check_in_date <' => $checkOut,
+                        'Bookings.check_out_date >' => $checkIn,
+                    ]);
+
+                return $exp->notExists($overlap);
+            })
+            ->limit(1);
+
+        return $query->where(function (QueryExpression $exp) use ($roomsSubquery) {
+            return $exp->exists($roomsSubquery);
+        });
     }
 }

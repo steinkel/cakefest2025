@@ -286,3 +286,50 @@ in templates/Bookings/search.php
 </div>
 ```
 
+# Use the ORM
+
+In BookingsController, uncomment the finder call
+```
+                    ->find('withAvailableRooms', checkIn: $checkInDate, checkOut: $checkOutDate)
+```
+
+In HotelsTable, add the custom finder
+```
+    public function findWithAvailableRooms(SelectQuery $query, Date $checkIn, Date $checkOut): SelectQuery
+    {
+        $roomsSubquery = $this->Rooms->find()
+            ->select(['Rooms.id'])
+            ->where(['Rooms.is_available' => true])
+            ->where(['Rooms.hotel_id = Hotels.id'])
+            ->where(function (QueryExpression $exp) use ($checkIn, $checkOut) {
+                // NOT EXISTS any overlapping active booking for the room
+                $overlap = $this->Rooms->Bookings->find('active')
+                    ->select(['Bookings.id'])
+                    ->where(['Bookings.room_id = Rooms.id'])
+                    // check if dates overlap
+                    ->where([
+                        'Bookings.check_in_date <' => $checkOut,
+                        'Bookings.check_out_date >' => $checkIn,
+                    ]);
+
+                return $exp->notExists($overlap);
+            })
+            ->limit(1);
+
+        return $query->where(function (QueryExpression $exp) use ($roomsSubquery) {
+            return $exp->exists($roomsSubquery);
+        });
+    }
+```
+
+In BookingsTable, add the custom finder
+
+```
+    public function findActive(SelectQuery $query): SelectQuery
+    {
+        return $query->whereNotInList(
+            $this->aliasField('booking_status'),
+            [Booking::STATUS_CANCELLED]
+        );
+    }
+```
