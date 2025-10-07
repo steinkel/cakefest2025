@@ -42,4 +42,9 @@ class Room extends Entity
         'room_type' => true,
         'bookings' => true,
     ];
+
+    protected function _getRoomNumberDisplay(): string
+    {
+        return $this->hotel?->name . ' ' . $this->room_number;
+    }
 }

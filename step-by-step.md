@@ -93,6 +93,23 @@ $status = Status::Pending;
 echo $status->value; // 'pending'
 ```
 
-
-
 * Improve Room display
+
+in Room entity
+```
+    protected function _getRoomNumberDisplay(): string
+    {
+        return $this->hotel?->name . ' ' . $this->room_number;
+    }
+```
+
+in Admin/BookingsController add/edit actions replace room loading with
+```
+$rooms = $this->Bookings->Rooms->find('list', limit: 200, contain: ['Hotels'])->all();
+```
+
+in RoomsTable initialize, replace displayField
+```
+$this->setDisplayField('room_number_display');
+```
+

@@ -57,7 +57,7 @@ class BookingsController extends AppController
             $this->Flash->error(__('The booking could not be saved. Please, try again.'));
         }
         $customers = $this->Bookings->Customers->find('list', limit: 200)->all();
-        $rooms = $this->Bookings->Rooms->find('list', limit: 200)->all();
+        $rooms = $this->Bookings->Rooms->find('list', limit: 200, contain: ['Hotels'])->all();
         $this->set(compact('booking', 'customers', 'rooms'));
     }
 
@@ -81,7 +81,7 @@ class BookingsController extends AppController
             $this->Flash->error(__('The booking could not be saved. Please, try again.'));
         }
         $customers = $this->Bookings->Customers->find('list', limit: 200)->all();
-        $rooms = $this->Bookings->Rooms->find('list', limit: 200)->all();
+        $rooms = $this->Bookings->Rooms->find('list', limit: 200, contain: ['Hotels'])->all();
         $this->set(compact('booking', 'customers', 'rooms'));
     }
 

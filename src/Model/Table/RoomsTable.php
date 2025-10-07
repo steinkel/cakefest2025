@@ -44,7 +44,7 @@ class RoomsTable extends Table
         parent::initialize($config);
 
         $this->setTable('rooms');
-        $this->setDisplayField('room_number');
+        $this->setDisplayField('room_number_display');
         $this->setPrimaryKey('id');
 
         $this->addBehavior('Timestamp');
