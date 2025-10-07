@@ -855,3 +855,16 @@ Add new template Bookings/view.php
 ```
 * Now that you identified refactor options for templates, give the view template a better structure
 
+# Public permissions
+
+* Copy permissions file from cakedc/users and add
+```
+        [
+            'role' => '*',
+            'prefix' => false,
+            'controller' => 'Bookings',
+            'action' => '*',
+            'bypassAuth' => true,
+        ],
+```
+
