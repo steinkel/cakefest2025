@@ -67,7 +67,7 @@ class BookingsController extends AppController
         $this->set(compact('hotel', 'availableRooms', 'checkIn', 'checkOut', 'nights'));
     }
 
-    public function startReservation(?int $roomId)
+    public function startReservation(int $roomId)
     {
         $checkIn = new Date($this->request->getQuery('check_in'));
         $checkOut = new Date($this->request->getQuery('check_out'));
@@ -77,9 +77,9 @@ class BookingsController extends AppController
             return $this->redirect(['action' => 'search']);
         }
 
-        $room = $this->Bookings->Rooms->get($roomId, [
-            'contain' => ['RoomTypes', 'Hotels']
-        ]);
+        $room = $this->Bookings->Rooms->get(
+            $roomId, contain: ['RoomTypes', 'Hotels']
+        );
 
         // Calculate total amount
         $nights = $checkIn->diffInDays($checkOut);
@@ -135,5 +135,19 @@ class BookingsController extends AppController
         }
 
         $this->set(compact('booking', 'room', 'checkIn', 'checkOut', 'nights', 'totalAmount'));
+    }
+
+    public function view(int $id)
+    {
+        $booking = $this->Bookings->get(
+            $id,
+            contain: [
+                'Customers',
+                'Rooms' => ['RoomTypes', 'Hotels'],
+                'Payments'
+            ],
+        );
+
+        $this->set(compact('booking'));
     }
 }
