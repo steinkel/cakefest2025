@@ -35,6 +35,18 @@ ddev phpmyadmin
 
 # Bake shell
 
+```
 ddev cake bake all --everything --prefix Admin
+```
 
+* fix Admin prefix routing
+
+in config/routes.php
+```
+    $routes->scope('/', function (RouteBuilder $builder): void {
+        $builder->prefix('Admin', function (RouteBuilder $builder) {
+            $builder->fallbacks();
+        });
+    //...
+```
 
