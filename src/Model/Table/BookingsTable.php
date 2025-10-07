@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Model\Table;
 
 use App\Model\Entity\Booking;
+use Cake\I18n\Date;
 use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
@@ -133,5 +134,16 @@ class BookingsTable extends Table
             $this->aliasField('booking_status'),
             [Booking::STATUS_CANCELLED]
         );
+    }
+
+    public function findOverlapping(SelectQuery $query, int $roomId, Date $checkIn, Date $checkOut): SelectQuery
+    {
+        return $query
+            ->find('active')
+            ->where([$this->aliasField('room_id') => $roomId])
+            ->where([
+                $this->aliasField('check_in_date') . ' <' => $checkOut,
+                $this->aliasField('check_out_date') . ' >' => $checkIn,
+            ]);
     }
 }
