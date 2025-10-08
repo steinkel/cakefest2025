@@ -6,6 +6,7 @@
     "homepage": "https://cakephp.org",
     "require": {
         "php": ">=8.1",
+        "cakedc/cakephp-mcp": "dev-master",
         "cakedc/users": "^15.1",
         "cakephp/cakephp": "5.2.*",
         "cakephp/migrations": "^4.0.0",
@@ -54,5 +55,6 @@
         "cs-check": "phpcs --colors -p",
         "cs-fix": "phpcbf --colors -p",
         "test": "phpunit --colors=always"
-    }
+    },
+    "minimum-stability": "dev"
 }

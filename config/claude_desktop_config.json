@@ -1,0 +1,13 @@
+{
+    "mcpServers": {
+        "default-server": {
+            "command": "FULL_PATH_TO_YOUR/bin/mcp",
+            "args": [
+
+            ],
+            "env": {
+                "FILE_LOG": "1"
+            }
+        }
+    }
+}

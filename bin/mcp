@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+
+cd /home/steinkel/cakefest2025 && ddev exec php /var/www/html/vendor/cakedc/cakephp-mcp/bin/mcp-server

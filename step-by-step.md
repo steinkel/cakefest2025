@@ -897,3 +897,158 @@ public function change(): void
     }
 ```
 
+# MCP Server
+
+* We will be using Claude Desktop. Download it and register for a free account.
+* Install the MCP Plugin
+
+```
+ddev composer config minimum-stability dev
+ddev composer require cakedc/cakephp-mcp:dev-master
+```
+
+* Create bin/mcp file and set execution (+x) permissions
+* Ensure you override your project root
+```
+#!/usr/bin/env sh
+
+cd YOUR_PROJECT_ROOT && ddev exec php /var/www/html/vendor/cakedc/cakephp-mcp/bin/mcp-server
+```
+
+* Edit your Claude local config
+
+```
+vi $HOME/.config/Claude/claude_desktop_config.json
+```
+
+```
+{
+    "mcpServers": {
+        "default-server": {
+            "command": "FULL_PATH_TO_YOUR/bin/mcp",
+            "args": [
+
+            ],
+            "env": {
+                "FILE_LOG": "1"
+            }
+        }
+    }
+}
+```
+
+* Now let's create a couple endpoints to use
+* Add the following 2 files to src/Mcp folder
+
+Bookings.php
+```
+<?php
+
+namespace App\Mcp;
+
+use App\Application;
+use Cake\Core\Configure;
+use Cake\Datasource\ModelAwareTrait;
+use Cake\Http\Server;
+use Cake\I18n\Date;
+use Cake\ORM\Locator\LocatorAwareTrait;
+use Mcp\Capability\Attribute\McpTool;
+use Mcp\JsonRpc\Handler;
+use Mcp\Server\ServerBuilder;
+use Mcp\Server\TransportInterface;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+
+class Bookings
+{
+    use LocatorAwareTrait;
+
+    protected const PAGE_SIZE = 20;
+
+
+    /**
+     * Searches for bookings within the provided check-in date range. The results are paginated.
+     *
+     * @param string $checkinFromDate The start date of the check-in range in 'YYYY-MM-DD' format.
+     * @param string $checkinToDate The end date of the check-in range in 'YYYY-MM-DD' format.
+     * @param int|null $page The page number for pagination. Defaults to 1 if not provided.
+     * @return array An array containing the search results with booking data and pagination details.
+     */
+    #[McpTool(name: 'searchByCheckinDate')]
+    public function searchByCheckinDate(string $checkinFromDate, string $checkinToDate, ?int $page = 1): array
+    {
+        $bookingsQuery = $this->fetchTable('Bookings')
+            ->find()
+            ->limit(self::PAGE_SIZE)
+            ->page($page)
+            ->where([
+                'check_in_date >=' => new Date($checkinFromDate),
+                'check_in_date <=' => new Date($checkinToDate)
+            ])
+            ->contain(['Customers', 'Rooms.RoomTypes', 'Rooms.Hotels'])
+            ->disableHydration()
+            ->disableResultsCasting();
+
+        $total = $bookingsQuery->count();
+
+        return [
+            'data' => $bookingsQuery->toArray(),
+            'pagination' => [
+                'page' => $page,
+                'pageSize' => 20,
+                'total' => $total,
+                'hasMore' => ($page * self::PAGE_SIZE) < $total,
+            ],
+        ];
+    }
+}
+```
+
+Customers.php
+```
+<?php
+
+namespace App\Mcp;
+
+use Cake\Mailer\Mailer;
+use Cake\ORM\Locator\LocatorAwareTrait;
+use Mcp\Capability\Attribute\McpTool;
+
+class Customers
+{
+    use LocatorAwareTrait;
+
+    /**
+     * Send email to customer
+     *
+     * @param int $customerId
+     * @param string $subject
+     * @param string $message
+     * @return array
+     */
+    #[McpTool(name: 'sendEmailToCustomer')]
+    public function sendEmailToCustomer(int $customerId, string $subject, string $message): array
+    {
+        try {
+            $customer = $this->fetchTable('Customers')->get($customerId);
+            $mailer = new Mailer('default');
+            $mailer->setFrom(['me@example.com' => 'My Site'])
+                ->setTo($customer->email)
+                ->setSubject($subject)
+                ->deliver($message);
+        } catch (\Throwable $e) {
+            return [
+                'success' => false,
+                'message' => 'Failed to send email to customer ' . $e->getMessage(),
+            ];
+        }
+
+        return [
+            'success' => true,
+            'message' => 'Email sent successfully to customer ' . $customer->email,
+        ];
+    }
+}
+```
+
+* Now run Claude desktop, you should be able to see the default-server enabled
