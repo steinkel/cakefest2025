@@ -1318,3 +1318,7 @@ echo implode(' | ', $displayData);
 ```
 <?= $this->cell('Welcome') ?>
 ```
+
+# Middlewares
+* Follow https://github.com/UseMuffin/Throttle
+
