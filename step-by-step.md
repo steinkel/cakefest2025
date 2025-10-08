@@ -1286,4 +1286,35 @@ curl "https://cakefest2025.ddev.site:9201/booking/_doc/1"
 
 * Follow https://www.dereuromark.de/2018/07/12/tutorial-cakephp-tagging/
 
+# Cell
 
+* Bake a new Welcome cell
+* display method
+
+```
+public function display()
+    {
+        $user = $this->request->getAttribute('identity');
+        $this->set('user', $user);
+    }
+```
+* template
+
+```
+<?php
+if (!$user) {
+    return;
+}
+
+$displayData = [
+    h($user->username),
+    h($user->role),
+    $this->Html->link(__('(logout)'), \Cake\Routing\Router::pathUrl('CakeDC/Users.Users::logout')),
+];
+echo implode(' | ', $displayData);
+```
+
+* inject the cell in the layout
+```
+<?= $this->cell('Welcome') ?>
+```
