@@ -1282,3 +1282,8 @@ curl "https://cakefest2025.ddev.site:9201/booking/_search" \
 
 curl "https://cakefest2025.ddev.site:9201/booking/_doc/1"
 ```
+# Tags
+
+* Follow https://www.dereuromark.de/2018/07/12/tutorial-cakephp-tagging/
+
+
