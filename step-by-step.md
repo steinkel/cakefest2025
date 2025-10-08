@@ -868,3 +868,32 @@ Add new template Bookings/view.php
         ],
 ```
 
+# Softdelete
+
+* https://github.com/UseMuffin/Trash
+```
+composer require muffin/trash
+ddev cake plugin load Muffin/Trash
+```
+* Add to HotelsTable
+```
+$this->addBehavior('Muffin/Trash.Trash');
+```
+* Add the required migration
+
+```
+ddev cake bake migration DeletedToHotels
+```
+
+```
+public function change(): void
+    {
+        $this->table('hotels')
+            ->addColumn('deleted', 'datetime', [
+                'default' => null,
+                'null' => true,
+            ])
+            ->update();
+    }
+```
+
