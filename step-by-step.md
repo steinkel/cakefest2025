@@ -1052,6 +1052,14 @@ class Customers
 ```
 
 * Now run Claude desktop, you should be able to see the default-server enabled
+* In case you want to debug the output via console
+
+```
+composer require --dev cakephp/repl
+bin/cake plugin load --only-cli --only-debug Cake/Repl
+# doc $mcpBookings->searchByCheckinDate
+```
+
 
 # Sending emails & commands
 
@@ -1210,4 +1218,67 @@ Hi <?= h($booking->customer->first_name) ?>,
 This is a reminder of your upcoming reservation at <?= h($booking->room->hotel->name) ?>.
 
 Thank you,
+```
+
+# Auditing changes
+* Install required plugins
+* NOTE First we need to remove cakedc/cakephp-mcp and return to 'stable' stability
+
+```
+composer require lorenzo/audit-stash
+ddev cake plugin load AuditStash
+
+composer require cakephp/elastic-search
+ddev cake plugin load Cake/ElasticSearch
+
+ddev add-on get ddev/ddev-elasticsearch
+ddev restart
+```
+
+* add datasource to the configuration
+
+```
+        'auditlog_elastic' => [
+            'className' => 'Cake\ElasticSearch\Datasource\Connection',
+            'driver' => 'Cake\ElasticSearch\Datasource\Connection',
+            'host' => 'CHECK_SERVER_USING_DDEV_STATUS',
+            'port' => 9200
+        ],
+```
+
+* For identity logs, add this to AppController
+
+```
+    public function beforeFilter(EventInterface $event): void
+    {
+        EventManager::instance()->on(
+            new RequestMetadata(
+                request: $this->getRequest(),
+                user: $this->getRequest()->getAttribute('identity')?->getIdentifier()
+            )
+        );
+    }
+```
+
+* Add to BookingsTable::initialize
+
+```
+$this->addBehavior('AuditStash.AuditLog');
+```
+
+* To view the adit logs, you can use curl
+
+```
+curl 'https://cakefest2025.ddev.site:9201/_cat/indices?v'
+curl "https://cakefest2025.ddev.site:9201/booking/_search" \
+  -H 'Content-Type: application/json' \
+    -d '{"query": {"match_all": {}}}'
+
+curl 'https://cakefest2025.ddev.site:9201/_cat/indices?v'
+
+curl "https://cakefest2025.ddev.site:9201/booking/_search" \
+  -H 'Content-Type: application/json' \
+  -d '{"query": {"match_all": {}}}'
+
+curl "https://cakefest2025.ddev.site:9201/booking/_doc/1"
 ```

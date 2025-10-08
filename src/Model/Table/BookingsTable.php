@@ -50,6 +50,7 @@ class BookingsTable extends Table
         $this->setPrimaryKey('id');
 
         $this->addBehavior('Timestamp');
+        $this->addBehavior('AuditStash.AuditLog');
 
         $this->belongsTo('Customers', [
             'foreignKey' => 'customer_id',

@@ -12,4 +12,6 @@ return [
         'onlyCli' => true,
     ],
     'CakeDC/Users' => [],
+    'Cake/ElasticSearch' => [],
+    'AuditStash' => [],
 ];

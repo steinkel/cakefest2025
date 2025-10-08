@@ -16,7 +16,10 @@ declare(strict_types=1);
  */
 namespace App\Controller;
 
+use AuditStash\Meta\RequestMetadata;
 use Cake\Controller\Controller;
+use Cake\Event\EventInterface;
+use Cake\Event\EventManager;
 
 /**
  * Application Controller
@@ -48,5 +51,15 @@ class AppController extends Controller
          * see https://book.cakephp.org/5/en/controllers/components/form-protection.html
          */
         //$this->loadComponent('FormProtection');
+    }
+
+    public function beforeFilter(EventInterface $event): void
+    {
+        EventManager::instance()->on(
+            new RequestMetadata(
+                request: $this->getRequest(),
+                user: $this->getRequest()->getAttribute('identity')?->getIdentifier()
+            )
+        );
     }
 }

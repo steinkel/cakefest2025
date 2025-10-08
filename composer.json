@@ -6,11 +6,12 @@
     "homepage": "https://cakephp.org",
     "require": {
         "php": ">=8.1",
-        "cakedc/cakephp-mcp": "dev-master",
         "cakedc/users": "^15.1",
         "cakephp/cakephp": "5.2.*",
+        "cakephp/elastic-search": "^4.0",
         "cakephp/migrations": "^4.0.0",
         "cakephp/plugin-installer": "^2.0",
+        "lorenzo/audit-stash": "^4.2",
         "mobiledetect/mobiledetectlib": "^4.8.03"
     },
     "require-dev": {
@@ -56,5 +57,5 @@
         "cs-fix": "phpcbf --colors -p",
         "test": "phpunit --colors=always"
     },
-    "minimum-stability": "dev"
+    "minimum-stability": "stable"
 }

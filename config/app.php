@@ -334,6 +334,12 @@ return [
             'log' => false,
             //'init' => ['SET GLOBAL innodb_stats_on_metadata = 0'],
         ],
+        'auditlog_elastic' => [
+            'className' => 'Cake\ElasticSearch\Datasource\Connection',
+            'driver' => 'Cake\ElasticSearch\Datasource\Connection',
+            'host' => 'elasticsearch',
+            'port' => 9200
+        ],
     ],
 
     /*
